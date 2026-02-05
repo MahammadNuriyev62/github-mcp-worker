@@ -148,6 +148,7 @@ Runs on **push to main** → auto-deploys to Cloudflare Workers.
 4. Now every push to `main` auto-deploys **and** sets the Worker secret. Fully hands-off.
 
 > **To rotate your PAT**: Just update the `GH_PAT` secret in GitHub and re-run the deploy workflow.
+
 ---
 
 ## Security

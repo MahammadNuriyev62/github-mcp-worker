@@ -11,8 +11,8 @@
     "inspect": "npx @modelcontextprotocol/inspector"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "agents": "^0.0.98"
+    "@modelcontextprotocol/sdk": "^1.25.2",
+    "agents": "^0.3.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250617.0",
