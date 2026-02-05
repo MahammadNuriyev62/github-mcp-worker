@@ -40,12 +40,14 @@ npm install
 # Login to Cloudflare (opens browser)
 npx wrangler login
 
-# Store your GitHub PAT as an encrypted secret
-npx wrangler secret put GITHUB_PAT
-
-# Deploy
+# First deploy
 npm run deploy
+
+# Set your GitHub PAT (one-time, CI/CD handles it after)
+npx wrangler secret put GITHUB_PAT
 ```
+
+Or skip the manual steps entirely — just push to `main` with CI/CD secrets configured and it deploys automatically.
 
 Your URL: `https://github-mcp-worker.<your-account>.workers.dev`
 
@@ -141,10 +143,11 @@ Runs on **push to main** → auto-deploys to Cloudflare Workers.
    |--------|-------|
    | `CLOUDFLARE_API_TOKEN` | Your Cloudflare API token |
    | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
+   | `GITHUB_PAT` | Your fine-grained GitHub token (public repos read-only) |
 
-4. Now every push to `main` auto-deploys. PRs get type-checked.
+4. Now every push to `main` auto-deploys **and** sets the Worker secret. Fully hands-off.
 
-> **Note**: The `GITHUB_PAT` for the Worker runtime is set separately via `npx wrangler secret put GITHUB_PAT` (or in the Cloudflare dashboard under Workers → Settings → Variables). The GitHub Actions secrets above are only for CI/CD auth with Cloudflare.
+> **To rotate your PAT**: Just update the `GITHUB_PAT` secret in GitHub and re-run the deploy workflow.
 
 ---
 
@@ -154,7 +157,7 @@ Runs on **push to main** → auto-deploys to Cloudflare Workers.
 - ✅ **Your infrastructure**: PAT stored as Cloudflare encrypted secret, never in code
 - ✅ **Minimal scope**: Fine-grained PAT with only public repo read access
 - ✅ **No third-party**: You own the Worker, no data passes through Smithery/Pipedream/etc.
-- 🔄 **Rotate regularly**: `npx wrangler secret put GITHUB_PAT` and paste a new token
+- 🔄 **Rotate regularly**: Update the `GITHUB_PAT` secret in GitHub repo settings → re-run deploy
 - 🔒 **Rate limits**: GitHub gives 5,000 req/hour with a PAT (60 without)
 
 ---
