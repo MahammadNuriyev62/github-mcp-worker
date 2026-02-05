@@ -143,12 +143,11 @@ Runs on **push to main** → auto-deploys to Cloudflare Workers.
    |--------|-------|
    | `CLOUDFLARE_API_TOKEN` | Your Cloudflare API token |
    | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
-   | `GITHUB_PAT` | Your fine-grained GitHub token (public repos read-only) |
+   | `GH_PAT` | Your fine-grained GitHub token (public repos read-only) |
 
 4. Now every push to `main` auto-deploys **and** sets the Worker secret. Fully hands-off.
 
-> **To rotate your PAT**: Just update the `GITHUB_PAT` secret in GitHub and re-run the deploy workflow.
-
+> **To rotate your PAT**: Just update the `GH_PAT` secret in GitHub and re-run the deploy workflow.
 ---
 
 ## Security
@@ -157,7 +156,7 @@ Runs on **push to main** → auto-deploys to Cloudflare Workers.
 - ✅ **Your infrastructure**: PAT stored as Cloudflare encrypted secret, never in code
 - ✅ **Minimal scope**: Fine-grained PAT with only public repo read access
 - ✅ **No third-party**: You own the Worker, no data passes through Smithery/Pipedream/etc.
-- 🔄 **Rotate regularly**: Update the `GITHUB_PAT` secret in GitHub repo settings → re-run deploy
+- 🔄 **Rotate regularly**: Update the `GH_PAT` secret in GitHub repo settings → re-run deploy
 - 🔒 **Rate limits**: GitHub gives 5,000 req/hour with a PAT (60 without)
 
 ---
