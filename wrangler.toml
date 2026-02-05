@@ -1,0 +1,9 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "github-mcp-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-29"
+compatibility_flags = ["nodejs_compat"]
+
+# Your GitHub PAT is stored as a secret (never in code)
+# Run: npx wrangler secret put GITHUB_PAT
+# Then paste your fine-grained token

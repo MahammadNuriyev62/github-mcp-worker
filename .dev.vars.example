@@ -1,0 +1,5 @@
+# Copy this to .dev.vars and fill in your token
+# This file is used by `wrangler dev` for local development
+# NEVER commit .dev.vars to git!
+
+GITHUB_PAT=ghp_your_fine_grained_token_here
