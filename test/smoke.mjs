@@ -8,7 +8,7 @@
  *   2. In another terminal: node test/smoke.mjs
  *
  * Or test against production:
- *   MCP_URL=https://github-mcp-worker.your-account.workers.dev/mcp node test/smoke.mjs
+ *   MCP_URL=https://github-mcp.your-account.workers.dev/mcp node test/smoke.mjs
  */
 
 const MCP_URL = process.env.MCP_URL || "http://localhost:8787/mcp";

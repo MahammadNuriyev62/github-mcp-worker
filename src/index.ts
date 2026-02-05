@@ -13,7 +13,7 @@ async function githubFetch(path: string, pat: string) {
     headers: {
       Authorization: `Bearer ${pat}`,
       Accept: "application/vnd.github.v3+json",
-      "User-Agent": "github-mcp-worker",
+      "User-Agent": "github-mcp",
     },
   });
   if (!res.ok) {
@@ -29,7 +29,7 @@ async function githubRawFetch(path: string, pat: string): Promise<string> {
     headers: {
       Authorization: `Bearer ${pat}`,
       Accept: "application/vnd.github.v3.raw",
-      "User-Agent": "github-mcp-worker",
+      "User-Agent": "github-mcp",
     },
   });
   if (!res.ok) {

@@ -33,8 +33,8 @@ Use it as a custom connector in Claude.ai web to browse any public GitHub repo �
 ### Deploy in 5 minutes
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/github-mcp-worker.git
-cd github-mcp-worker
+git clone https://github.com/YOUR_USERNAME/github-mcp.git
+cd github-mcp
 npm install
 
 # Login to Cloudflare (opens browser)
@@ -49,13 +49,13 @@ npx wrangler secret put GITHUB_PAT
 
 Or skip the manual steps entirely — just push to `main` with CI/CD secrets configured and it deploys automatically.
 
-Your URL: `https://github-mcp-worker.<your-account>.workers.dev`
+Your URL: `https://github-mcp.<your-account>.workers.dev`
 
 ### Connect to Claude.ai
 
 1. Go to **claude.ai → Settings → Connectors**
 2. Click **"Add custom connector"**
-3. Enter: `https://github-mcp-worker.<your-account>.workers.dev/mcp`
+3. Enter: `https://github-mcp.<your-account>.workers.dev/mcp`
 4. Start a new chat, enable the connector, and ask away!
 
 ---
@@ -105,7 +105,7 @@ npm test
 Test against production:
 
 ```bash
-MCP_URL=https://github-mcp-worker.your-account.workers.dev/mcp npm run test:prod
+MCP_URL=https://github-mcp.your-account.workers.dev/mcp npm run test:prod
 ```
 
 ### Type Checking
@@ -181,7 +181,7 @@ Read the comments on issue #42 in repo X
 ## Project Structure
 
 ```
-github-mcp-worker/
+github-mcp/
 ├── src/
 │   └── index.ts          # MCP server + all tool definitions
 ├── test/
