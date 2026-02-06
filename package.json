@@ -1,21 +1,34 @@
 {
   "name": "github-mcp",
   "version": "1.0.0",
-  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "github-mcp": "dist/main.js"
+  },
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "build": "node build.mjs",
+    "start": "node dist/main.js --stdio",
+    "serve": "node dist/main.js",
     "test": "node test/smoke.mjs",
+    "test:node": "MCP_URL=http://localhost:3001/mcp node test/smoke.mjs",
     "test:prod": "MCP_URL=$PROD_URL/mcp node test/smoke.mjs",
-    "inspect": "npx @modelcontextprotocol/inspector"
+    "inspect": "npx @modelcontextprotocol/inspector",
+    "pack": "npx @anthropic-ai/mcpb pack ."
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
-    "agents": "^0.3.10"
+    "agents": "^0.3.10",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250617.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.25.0",
     "typescript": "^5.7.3",
     "wrangler": "^4.22.0"
   }

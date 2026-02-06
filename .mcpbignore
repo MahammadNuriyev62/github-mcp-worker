@@ -1,0 +1,16 @@
+node_modules/
+src/
+*.ts
+!*.d.ts
+.wrangler/
+.dev.vars
+.dev.vars.example
+.github/
+test/
+wrangler.toml
+tsconfig*.json
+build.mjs
+.git/
+.gitignore
+*.mcpb
+.claude/

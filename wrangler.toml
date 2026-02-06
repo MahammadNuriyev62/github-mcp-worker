@@ -4,6 +4,9 @@ main = "src/index.ts"
 compatibility_date = "2025-01-29"
 compatibility_flags = ["nodejs_compat"]
 
-# Your GitHub PAT is stored as a secret (never in code)
+# Your default GitHub PAT is stored as a secret (never in code)
 # Run: npx wrangler secret put GITHUB_PAT
 # Then paste your fine-grained token
+#
+# Users can provide their own PAT via the "OAuth Client Secret"
+# field in Claude's connector settings for higher rate limits.

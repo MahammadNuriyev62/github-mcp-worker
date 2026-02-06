@@ -3,3 +3,5 @@ dist/
 .wrangler/
 .dev.vars
 *.log
+*.mcpb
+.claude

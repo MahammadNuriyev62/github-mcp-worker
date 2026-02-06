@@ -1,0 +1,38 @@
+name: Build & Release .mcpb Bundle
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: # manual trigger
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed to create releases
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Node.js dist
+        run: npm run build
+
+      - name: Pack .mcpb bundle
+        run: npm run pack
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.mcpb"
+          generate_release_notes: true

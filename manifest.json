@@ -1,0 +1,36 @@
+{
+  "manifest_version": "0.3",
+  "name": "github-mcp",
+  "display_name": "GitHub Browser",
+  "description": "Read-only GitHub MCP server — search repos, read files, browse issues and PRs",
+  "author": { "name": "maganuriyev" },
+  "version": "1.0.0",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/main.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/main.js", "--stdio"]
+    }
+  },
+  "tools": [
+    { "name": "search_repos", "description": "Search GitHub repositories by keyword" },
+    { "name": "search_code", "description": "Search code across all public GitHub repositories" },
+    { "name": "get_repo", "description": "Get detailed information about a repository" },
+    { "name": "list_contents", "description": "List files and directories in a repository path" },
+    { "name": "read_file", "description": "Read the contents of a file from a repository" },
+    { "name": "get_readme", "description": "Get the README file of a repository" },
+    { "name": "list_commits", "description": "List recent commits in a repository" },
+    { "name": "get_tree", "description": "Get full directory tree of a repository (recursive)" },
+    { "name": "list_issues", "description": "List issues in a repository" },
+    { "name": "get_issue", "description": "Get details of a specific issue" },
+    { "name": "get_issue_comments", "description": "Get comments on an issue" },
+    { "name": "list_pulls", "description": "List pull requests in a repository" },
+    { "name": "get_pull", "description": "Get details of a specific pull request" },
+    { "name": "get_pull_files", "description": "Get list of files changed in a pull request" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}
