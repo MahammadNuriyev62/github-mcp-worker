@@ -50,7 +50,13 @@ Add as a connector in Claude — no installation needed:
 1. Go to **claude.ai → Settings → Connectors**
 2. Click **"Add custom connector"**
 3. Enter URL: `https://github-mcp.maganuriyev.workers.dev/mcp`
-4. (Optional) Expand **Advanced settings** and paste your GitHub PAT into **"OAuth Client Secret"** for higher rate limits (5,000 req/hr instead of 60)
+4. (Optional) For higher rate limits (5,000 req/hr instead of 60), add a GitHub Personal Access Token:
+   - Go to [github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
+   - Set a descriptive name (e.g. `github-mcp`) and expiration
+   - Under **Repository access**, select **"Public Repositories (read-only)"**
+   - No additional permissions needed — the default read-only access to public repos is sufficient
+   - Click **Generate token** and copy it
+   - Back in Claude, expand **Advanced settings** and paste the token into **"OAuth Client Secret"**
 
 Works out of the box without a PAT — unauthenticated requests use the server's default GitHub token.
 
