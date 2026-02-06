@@ -11,6 +11,10 @@ Add this as a custom MCP connector in Claude:
 3. Enter: `https://github-mcp.maganuriyev.workers.dev/mcp`
 4. Start a new chat, enable the connector, and ask away!
 
+## Example Prompt
+
+> What are some beginner-friendly open issues on huggingface/transformers that would make for easy open source contributions?
+
 ## Tools (14)
 
 | Tool | Description |
