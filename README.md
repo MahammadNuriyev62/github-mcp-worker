@@ -8,7 +8,24 @@
 
 ## Installation
 
-### Option 1: Install Bundle (Claude Desktop)
+### Option 1: Use Remote URL
+
+Add as a connector in Claude — no installation needed:
+
+1. Go to **claude.ai → Settings → Connectors**
+2. Click **"Add custom connector"**
+3. Enter URL: `https://github-mcp.maganuriyev.workers.dev/mcp`
+4. (Optional) For higher rate limits (5,000 req/hr instead of 60), add a GitHub Personal Access Token:
+   - Go to [github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
+   - Set a descriptive name (e.g. `github-mcp`) and expiration
+   - Under **Repository access**, select **"Public Repositories (read-only)"**
+   - No additional permissions needed — the default read-only access to public repos is sufficient
+   - Click **Generate token** and copy it
+   - Back in Claude, expand **Advanced settings** and paste the token into **"OAuth Client Secret"**
+
+Works out of the box without a PAT — unauthenticated requests use the server's default GitHub token.
+
+### Option 2: Install Bundle (Claude Desktop)
 
 1. Download `github-mcp.mcpb` from the [latest release](https://github.com/maganuriyev/github-mcp-worker/releases)
 2. Double-click the `.mcpb` file — Claude Desktop installs it automatically
@@ -17,7 +34,7 @@
    "env": { "GITHUB_PAT": "ghp_your_token_here" }
    ```
 
-### Option 2: Build from Source
+### Option 3: Build from Source
 
 ```bash
 git clone https://github.com/maganuriyev/github-mcp-worker.git
@@ -46,23 +63,6 @@ Or run as an HTTP server for other MCP clients:
 GITHUB_PAT=ghp_xxx node dist/main.js --port 3001
 # → http://localhost:3001/mcp
 ```
-
-### Option 3: Use Remote URL
-
-Add as a connector in Claude — no installation needed:
-
-1. Go to **claude.ai → Settings → Connectors**
-2. Click **"Add custom connector"**
-3. Enter URL: `https://github-mcp.maganuriyev.workers.dev/mcp`
-4. (Optional) For higher rate limits (5,000 req/hr instead of 60), add a GitHub Personal Access Token:
-   - Go to [github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
-   - Set a descriptive name (e.g. `github-mcp`) and expiration
-   - Under **Repository access**, select **"Public Repositories (read-only)"**
-   - No additional permissions needed — the default read-only access to public repos is sufficient
-   - Click **Generate token** and copy it
-   - Back in Claude, expand **Advanced settings** and paste the token into **"OAuth Client Secret"**
-
-Works out of the box without a PAT — unauthenticated requests use the server's default GitHub token.
 
 ## Example Prompts
 
