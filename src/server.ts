@@ -50,6 +50,7 @@ export function createServer(pat?: string): McpServer {
       query: z.string().describe("Search query (e.g. 'GRPO reinforcement learning')"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
+    { title: "Search Repositories", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query, per_page }) => {
       const data: any = await githubFetch(
         `/search/repositories?q=${encodeURIComponent(query)}&per_page=${Math.min(per_page, 30)}`,
@@ -75,6 +76,7 @@ export function createServer(pat?: string): McpServer {
       query: z.string().describe("Code search query (e.g. 'GRPO loss function language:python')"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
+    { title: "Search Code", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ query, per_page }) => {
       const data: any = await githubFetch(
         `/search/code?q=${encodeURIComponent(query)}&per_page=${Math.min(per_page, 30)}`,
@@ -98,6 +100,7 @@ export function createServer(pat?: string): McpServer {
       owner: z.string().describe("Repository owner (e.g. 'huggingface')"),
       repo: z.string().describe("Repository name (e.g. 'transformers')"),
     },
+    { title: "Get Repository Info", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo }) => {
       const data: any = await githubFetch(`/repos/${owner}/${repo}`, pat);
       const info = {
@@ -127,6 +130,7 @@ export function createServer(pat?: string): McpServer {
       path: z.string().optional().default("").describe("Path within repo (empty for root)"),
       branch: z.string().optional().describe("Branch name (defaults to repo default branch)"),
     },
+    { title: "List Directory Contents", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, branch }) => {
       const branchParam = branch ? `?ref=${branch}` : "";
       const data: any = await githubFetch(
@@ -155,6 +159,7 @@ export function createServer(pat?: string): McpServer {
       path: z.string().describe("File path (e.g. 'src/train.py')"),
       branch: z.string().optional().describe("Branch name (defaults to repo default branch)"),
     },
+    { title: "Read File", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, branch }) => {
       const branchParam = branch ? `?ref=${branch}` : "";
       const content = await githubRawFetch(
@@ -173,6 +178,7 @@ export function createServer(pat?: string): McpServer {
       owner: z.string().describe("Repository owner"),
       repo: z.string().describe("Repository name"),
     },
+    { title: "Get README", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo }) => {
       const content = await githubRawFetch(`/repos/${owner}/${repo}/readme`, pat);
       return { content: [{ type: "text" as const, text: content }] };
@@ -189,6 +195,7 @@ export function createServer(pat?: string): McpServer {
       path: z.string().optional().describe("Filter by file path"),
       per_page: z.number().optional().default(10).describe("Number of commits (max 30)"),
     },
+    { title: "List Commits", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, per_page }) => {
       let url = `/repos/${owner}/${repo}/commits?per_page=${Math.min(per_page, 30)}`;
       if (path) url += `&path=${encodeURIComponent(path)}`;
@@ -212,6 +219,7 @@ export function createServer(pat?: string): McpServer {
       repo: z.string().describe("Repository name"),
       branch: z.string().optional().default("HEAD").describe("Branch name"),
     },
+    { title: "Get Repository Tree", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, branch }) => {
       const data: any = await githubFetch(
         `/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
@@ -235,6 +243,7 @@ export function createServer(pat?: string): McpServer {
       labels: z.string().optional().describe("Comma-separated label names"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
+    { title: "List Issues", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, state, labels, per_page }) => {
       let url = `/repos/${owner}/${repo}/issues?state=${state}&per_page=${Math.min(per_page, 30)}`;
       if (labels) url += `&labels=${encodeURIComponent(labels)}`;
@@ -263,6 +272,7 @@ export function createServer(pat?: string): McpServer {
       repo: z.string().describe("Repository name"),
       issue_number: z.number().describe("Issue number"),
     },
+    { title: "Get Issue Details", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, issue_number }) => {
       const data: any = await githubFetch(`/repos/${owner}/${repo}/issues/${issue_number}`, pat);
       const issue = {
@@ -289,6 +299,7 @@ export function createServer(pat?: string): McpServer {
       issue_number: z.number().describe("Issue number"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
+    { title: "Get Issue Comments", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, issue_number, per_page }) => {
       const data: any = await githubFetch(
         `/repos/${owner}/${repo}/issues/${issue_number}/comments?per_page=${Math.min(per_page, 30)}`,
@@ -313,6 +324,7 @@ export function createServer(pat?: string): McpServer {
       state: z.enum(["open", "closed", "all"]).optional().default("open").describe("PR state"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
+    { title: "List Pull Requests", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, state, per_page }) => {
       const data: any = await githubFetch(
         `/repos/${owner}/${repo}/pulls?state=${state}&per_page=${Math.min(per_page, 30)}`,
@@ -339,6 +351,7 @@ export function createServer(pat?: string): McpServer {
       repo: z.string().describe("Repository name"),
       pull_number: z.number().describe("Pull request number"),
     },
+    { title: "Get Pull Request Details", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, pull_number }) => {
       const data: any = await githubFetch(`/repos/${owner}/${repo}/pulls/${pull_number}`, pat);
       const pr = {
@@ -366,6 +379,7 @@ export function createServer(pat?: string): McpServer {
       repo: z.string().describe("Repository name"),
       pull_number: z.number().describe("Pull request number"),
     },
+    { title: "Get Pull Request Files", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, pull_number }) => {
       const data: any = await githubFetch(
         `/repos/${owner}/${repo}/pulls/${pull_number}/files`,
