@@ -142,6 +142,10 @@ git push origin v1.0.0
 
 Or manually: `npm run build && npx @anthropic-ai/mcpb pack .`
 
+## Uptime
+
+Check the current server status and uptime history: [status.uptimerobot.com](https://stats.uptimerobot.com/Vo2UtuhevR)
+
 ## Privacy Policy
 
 See [PRIVACY.md](PRIVACY.md). In short: this server is read-only, collects no data, and never stores tokens.
