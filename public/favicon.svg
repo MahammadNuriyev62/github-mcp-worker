@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#0d1117"/>
+  <!-- Left bracket -->
+  <path d="M20,64 L50,38" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
+  <path d="M20,64 L50,90" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
+  <!-- Right bracket -->
+  <path d="M108,64 L78,38" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
+  <path d="M108,64 L78,90" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
+  <!-- Pupil -->
+  <circle cx="64" cy="64" r="14" fill="#58a6ff"/>
+  <circle cx="60" cy="60" r="4.5" fill="#fff" opacity="0.6"/>
+</svg>

@@ -2,7 +2,12 @@ import { createServer } from "./server.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { ICON_SVG, ICON_ICO_BASE64 } from "./icon.js";
+import { readFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const publicDir = resolve(__dirname, "..", "public");
 
 // Parse CLI args
 const args = process.argv.slice(2);
@@ -48,7 +53,7 @@ async function runHttp() {
 
     // Favicon (ICO)
     if (url.pathname === "/favicon.ico") {
-      const buf = Buffer.from(ICON_ICO_BASE64, "base64");
+      const buf = readFileSync(resolve(publicDir, "favicon.ico"));
       res.writeHead(200, { "Content-Type": "image/x-icon", "Cache-Control": "public, max-age=86400" });
       res.end(buf);
       return;
@@ -56,8 +61,9 @@ async function runHttp() {
 
     // Favicon (SVG)
     if (url.pathname === "/favicon.svg") {
+      const svg = readFileSync(resolve(publicDir, "favicon.svg"), "utf-8");
       res.writeHead(200, { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400" });
-      res.end(ICON_SVG);
+      res.end(svg);
       return;
     }
 
