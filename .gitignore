@@ -4,4 +4,8 @@ dist/
 .dev.vars
 *.log
 *.mcpb
-.claude
+# Allow .claude/settings.json and hooks to be committed
+!.claude/
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
