@@ -4,7 +4,7 @@
 
 <h1 align="center">GitHub Browser (MCP)</h1>
 
-<p align="center">A read-only GitHub MCP server that lets Claude browse any public GitHub repo. Bypasses Cloudflare's bot protection and other access issues that break web-based code browsing.</p>
+<p align="center">Browse any public GitHub repository directly from Claude — reliably, without the access errors that usually happen when Claude tries to do it from the web. Search repositories and code, read files, explore project structures, review pull requests, and browse issues. Great for discovering open source issues to contribute to, reviewing code changes, understanding unfamiliar projects, or finding real-world code examples. Works instantly with no setup required. Optionally add a read-only GitHub Personal Access Token for higher rate limits.</p>
 
 ## Installation
 
@@ -141,6 +141,10 @@ git push origin v1.0.0
 ```
 
 Or manually: `npm run build && npx @anthropic-ai/mcpb pack .`
+
+## Uptime
+
+Check the current server status and uptime history: [status.uptimerobot.com](https://stats.uptimerobot.com/Vo2UtuhevR)
 
 ## Privacy Policy
 
