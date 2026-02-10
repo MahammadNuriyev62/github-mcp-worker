@@ -2,6 +2,7 @@ import { createServer } from "./server.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { ICON_SVG, ICON_ICO_BASE64 } from "./icon.js";
 
 // Parse CLI args
 const args = process.argv.slice(2);
@@ -42,6 +43,21 @@ async function runHttp() {
       setCorsHeaders(res);
       res.writeHead(204);
       res.end();
+      return;
+    }
+
+    // Favicon (ICO)
+    if (url.pathname === "/favicon.ico") {
+      const buf = Buffer.from(ICON_ICO_BASE64, "base64");
+      res.writeHead(200, { "Content-Type": "image/x-icon", "Cache-Control": "public, max-age=86400" });
+      res.end(buf);
+      return;
+    }
+
+    // Favicon (SVG)
+    if (url.pathname === "/favicon.svg") {
+      res.writeHead(200, { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400" });
+      res.end(ICON_SVG);
       return;
     }
 

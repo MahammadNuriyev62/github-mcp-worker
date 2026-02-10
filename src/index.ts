@@ -7,6 +7,7 @@ import {
   handleToken,
   resolveGitHubToken,
 } from "./auth.js";
+import { ICON_SVG, ICON_ICO_BASE64 } from "./icon.js";
 
 // Type for Cloudflare Worker environment
 interface Env {
@@ -51,6 +52,21 @@ export default {
     // Token endpoint
     if (url.pathname === "/token") {
       return handleToken(request);
+    }
+
+    // Favicon (ICO)
+    if (url.pathname === "/favicon.ico") {
+      const bytes = Uint8Array.from(atob(ICON_ICO_BASE64), (c) => c.charCodeAt(0));
+      return new Response(bytes, {
+        headers: { "Content-Type": "image/x-icon", "Cache-Control": "public, max-age=86400" },
+      });
+    }
+
+    // Favicon (SVG)
+    if (url.pathname === "/favicon.svg") {
+      return new Response(ICON_SVG, {
+        headers: { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=86400" },
+      });
     }
 
     // MCP endpoint
