@@ -2,7 +2,7 @@
   <img src="public/favicon.svg" alt="GitHub MCP logo" width="96" height="96">
 </p>
 
-<h1 align="center">GitHub MCP</h1>
+<h1 align="center">GitHub Browser (MCP)</h1>
 
 <p align="center">A read-only GitHub MCP server that lets Claude browse any public GitHub repo. Bypasses Cloudflare's bot protection and other access issues that break web-based code browsing.</p>
 
