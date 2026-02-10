@@ -60,9 +60,13 @@ Add as a connector in Claude — no installation needed:
 
 Works out of the box without a PAT — unauthenticated requests use the server's default GitHub token.
 
-## Example Prompt
+## Example Prompts
 
 > What are some beginner-friendly open issues on huggingface/transformers that would make for easy open source contributions?
+
+> Show me the files changed in the latest pull request on facebook/react and summarize what the PR does.
+
+> Read the README of langchain-ai/langchain and give me a quick overview of the project architecture.
 
 ## CLI Options
 
@@ -133,6 +137,10 @@ git push origin v1.0.0
 ```
 
 Or manually: `npm run build && npx @anthropic-ai/mcpb pack .`
+
+## Privacy Policy
+
+See [PRIVACY.md](PRIVACY.md). In short: this server is read-only, collects no data, and never stores tokens.
 
 ## License
 
