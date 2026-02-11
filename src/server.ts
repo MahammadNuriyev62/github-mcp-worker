@@ -1,7 +1,44 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-// GitHub API helper
+// ── Input validation ──
+
+// GitHub owner/repo names: alphanumeric, hyphens, dots, underscores
+const zOwner = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9-]*$/, "Invalid GitHub owner name");
+const zRepo = z.string().regex(/^[a-zA-Z0-9._-]+$/, "Invalid GitHub repository name");
+
+// Encode repo path segments (preserves '/' separators, encodes each segment)
+function encodePath(path: string): string {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
+// ── Safe error handling ──
+
+const STATUS_LABELS: Record<number, string> = {
+  401: "Unauthorized",
+  403: "Forbidden (may be rate-limited)",
+  404: "Not Found",
+  409: "Conflict (repository may be empty)",
+  422: "Validation Failed",
+  451: "Unavailable For Legal Reasons",
+};
+
+function formatGitHubError(status: number, body: string): string {
+  const label = STATUS_LABELS[status] || `HTTP ${status}`;
+  // Extract only GitHub's user-facing "message" field from JSON
+  try {
+    const json = JSON.parse(body);
+    if (typeof json.message === "string") {
+      return `GitHub API ${status} (${label}): ${json.message}`;
+    }
+  } catch {
+    // Not JSON — use status label only
+  }
+  return `GitHub API ${status} (${label})`;
+}
+
+// ── GitHub API helpers ──
+
 async function githubFetch(path: string, pat?: string) {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github.v3+json",
@@ -12,8 +49,7 @@ async function githubFetch(path: string, pat?: string) {
   }
   const res = await fetch(`https://api.github.com${path}`, { headers });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub API ${res.status}: ${text}`);
+    throw new Error(formatGitHubError(res.status, await res.text()));
   }
   return res.json();
 }
@@ -29,8 +65,7 @@ async function githubRawFetch(path: string, pat?: string): Promise<string> {
   }
   const res = await fetch(`https://api.github.com${path}`, { headers });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub API ${res.status}: ${text}`);
+    throw new Error(formatGitHubError(res.status, await res.text()));
   }
   return res.text();
 }
@@ -97,12 +132,12 @@ export function createServer(pat?: string): McpServer {
     "get_repo",
     "Get detailed information about a repository",
     {
-      owner: z.string().describe("Repository owner (e.g. 'huggingface')"),
-      repo: z.string().describe("Repository name (e.g. 'transformers')"),
+      owner: zOwner.describe("Repository owner (e.g. 'huggingface')"),
+      repo: zRepo.describe("Repository name (e.g. 'transformers')"),
     },
     { title: "Get Repository Info", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo }) => {
-      const data: any = await githubFetch(`/repos/${owner}/${repo}`, pat);
+      const data: any = await githubFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, pat);
       const info = {
         name: data.full_name,
         description: data.description,
@@ -125,16 +160,16 @@ export function createServer(pat?: string): McpServer {
     "list_contents",
     "List files and directories in a repository path",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       path: z.string().optional().default("").describe("Path within repo (empty for root)"),
       branch: z.string().optional().describe("Branch name (defaults to repo default branch)"),
     },
     { title: "List Directory Contents", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, branch }) => {
-      const branchParam = branch ? `?ref=${branch}` : "";
+      const branchParam = branch ? `?ref=${encodeURIComponent(branch)}` : "";
       const data: any = await githubFetch(
-        `/repos/${owner}/${repo}/contents/${path}${branchParam}`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodePath(path)}${branchParam}`,
         pat,
       );
       const items = Array.isArray(data)
@@ -154,16 +189,16 @@ export function createServer(pat?: string): McpServer {
     "read_file",
     "Read the contents of a file from a repository",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       path: z.string().describe("File path (e.g. 'src/train.py')"),
       branch: z.string().optional().describe("Branch name (defaults to repo default branch)"),
     },
     { title: "Read File", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, branch }) => {
-      const branchParam = branch ? `?ref=${branch}` : "";
+      const branchParam = branch ? `?ref=${encodeURIComponent(branch)}` : "";
       const content = await githubRawFetch(
-        `/repos/${owner}/${repo}/contents/${path}${branchParam}`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodePath(path)}${branchParam}`,
         pat,
       );
       return { content: [{ type: "text" as const, text: content }] };
@@ -175,12 +210,12 @@ export function createServer(pat?: string): McpServer {
     "get_readme",
     "Get the README file of a repository",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
     },
     { title: "Get README", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo }) => {
-      const content = await githubRawFetch(`/repos/${owner}/${repo}/readme`, pat);
+      const content = await githubRawFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/readme`, pat);
       return { content: [{ type: "text" as const, text: content }] };
     },
   );
@@ -190,14 +225,14 @@ export function createServer(pat?: string): McpServer {
     "list_commits",
     "List recent commits in a repository",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       path: z.string().optional().describe("Filter by file path"),
       per_page: z.number().optional().default(10).describe("Number of commits (max 30)"),
     },
     { title: "List Commits", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, path, per_page }) => {
-      let url = `/repos/${owner}/${repo}/commits?per_page=${Math.min(per_page, 30)}`;
+      let url = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits?per_page=${Math.min(per_page, 30)}`;
       if (path) url += `&path=${encodeURIComponent(path)}`;
       const data: any = await githubFetch(url, pat);
       const commits = data.map((c: any) => ({
@@ -215,14 +250,14 @@ export function createServer(pat?: string): McpServer {
     "get_tree",
     "Get full directory tree of a repository (recursive)",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       branch: z.string().optional().default("HEAD").describe("Branch name"),
     },
     { title: "Get Repository Tree", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, branch }) => {
       const data: any = await githubFetch(
-        `/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees/${encodeURIComponent(branch)}?recursive=1`,
         pat,
       );
       const tree = data.tree
@@ -237,15 +272,15 @@ export function createServer(pat?: string): McpServer {
     "list_issues",
     "List issues in a repository",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       state: z.enum(["open", "closed", "all"]).optional().default("open").describe("Issue state"),
       labels: z.string().optional().describe("Comma-separated label names"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
     { title: "List Issues", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, state, labels, per_page }) => {
-      let url = `/repos/${owner}/${repo}/issues?state=${state}&per_page=${Math.min(per_page, 30)}`;
+      let url = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/issues?state=${state}&per_page=${Math.min(per_page, 30)}`;
       if (labels) url += `&labels=${encodeURIComponent(labels)}`;
       const data: any = await githubFetch(url, pat);
       const issues = data
@@ -268,13 +303,13 @@ export function createServer(pat?: string): McpServer {
     "get_issue",
     "Get details of a specific issue",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       issue_number: z.number().describe("Issue number"),
     },
     { title: "Get Issue Details", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, issue_number }) => {
-      const data: any = await githubFetch(`/repos/${owner}/${repo}/issues/${issue_number}`, pat);
+      const data: any = await githubFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/issues/${issue_number}`, pat);
       const issue = {
         number: data.number,
         title: data.title,
@@ -294,15 +329,15 @@ export function createServer(pat?: string): McpServer {
     "get_issue_comments",
     "Get comments on an issue",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       issue_number: z.number().describe("Issue number"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
     { title: "Get Issue Comments", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, issue_number, per_page }) => {
       const data: any = await githubFetch(
-        `/repos/${owner}/${repo}/issues/${issue_number}/comments?per_page=${Math.min(per_page, 30)}`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/issues/${issue_number}/comments?per_page=${Math.min(per_page, 30)}`,
         pat,
       );
       const comments = data.map((c: any) => ({
@@ -319,15 +354,15 @@ export function createServer(pat?: string): McpServer {
     "list_pulls",
     "List pull requests in a repository",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       state: z.enum(["open", "closed", "all"]).optional().default("open").describe("PR state"),
       per_page: z.number().optional().default(10).describe("Results per page (max 30)"),
     },
     { title: "List Pull Requests", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, state, per_page }) => {
       const data: any = await githubFetch(
-        `/repos/${owner}/${repo}/pulls?state=${state}&per_page=${Math.min(per_page, 30)}`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pulls?state=${state}&per_page=${Math.min(per_page, 30)}`,
         pat,
       );
       const pulls = data.map((p: any) => ({
@@ -347,13 +382,13 @@ export function createServer(pat?: string): McpServer {
     "get_pull",
     "Get details of a specific pull request",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       pull_number: z.number().describe("Pull request number"),
     },
     { title: "Get Pull Request Details", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, pull_number }) => {
-      const data: any = await githubFetch(`/repos/${owner}/${repo}/pulls/${pull_number}`, pat);
+      const data: any = await githubFetch(`/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pulls/${pull_number}`, pat);
       const pr = {
         number: data.number,
         title: data.title,
@@ -375,14 +410,14 @@ export function createServer(pat?: string): McpServer {
     "get_pull_files",
     "Get list of files changed in a pull request",
     {
-      owner: z.string().describe("Repository owner"),
-      repo: z.string().describe("Repository name"),
+      owner: zOwner.describe("Repository owner"),
+      repo: zRepo.describe("Repository name"),
       pull_number: z.number().describe("Pull request number"),
     },
     { title: "Get Pull Request Files", readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     async ({ owner, repo, pull_number }) => {
       const data: any = await githubFetch(
-        `/repos/${owner}/${repo}/pulls/${pull_number}/files`,
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pulls/${pull_number}/files`,
         pat,
       );
       const files = data.map((f: any) => ({
